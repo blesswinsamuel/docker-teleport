@@ -38,6 +38,7 @@ jobs:
           [ "$VERSION" == "main" ] && VERSION=latest
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
+          docker buildx create --name mybuilder --use
           docker buildx build --platform linux/amd64,linux/arm64 -t $IMAGE_ID:$VERSION --push .
       - name: Slack Notification
         uses: homoluctus/slatify@v2.1.2
