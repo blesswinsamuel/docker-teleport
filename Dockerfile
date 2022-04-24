@@ -1,7 +1,8 @@
 FROM ubuntu:20.04
 
-ARG version
-ARG arch
+ENV TELEPORT_VERSION=9.1.0
+ARG TARGETPLATFORM
+
 # Install dumb-init and ca-certificates. The dumb-init package is to ensure
 # signals and orphaned processes are are handled correctly. The ca-certificate
 # package is installed because the base Ubuntu image does not come with any
@@ -16,9 +17,16 @@ RUN apt-get update && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN TELEPORT_VERSION=${version} \
-    TEMP_DIR=$(mktemp -d) && cd $TEMP_DIR \
-    && curl -o teleport.tar.gz -fsSL https://get.gravitational.com/teleport-v${TELEPORT_VERSION}-linux-${arch}-bin.tar.gz \
+RUN case ${TARGETPLATFORM} in \
+         "linux/amd64")  ARCH=amd64  ;; \
+         "linux/arm64")  ARCH=arm64  ;; \
+         "linux/arm/v7") ARCH=armhf  ;; \
+         "linux/arm/v6") ARCH=armel  ;; \
+         "linux/386")    ARCH=i386   ;; \
+    esac \
+    && TEMP_DIR=$(mktemp -d) 
+    && cd $TEMP_DIR \
+    && curl -o teleport.tar.gz -fsSL https://get.gravitational.com/teleport-v${TELEPORT_VERSION}-linux-${ARCH}-bin.tar.gz \
     && tar xvf teleport.tar.gz --strip=1 teleport/teleport teleport/tctl teleport/tsh \
     && mv teleport tctl tsh /usr/local/bin \
     && rm -rf $TEMP_DIR
