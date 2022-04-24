@@ -24,7 +24,7 @@ RUN case ${TARGETPLATFORM} in \
          "linux/arm/v6") ARCH=armel  ;; \
          "linux/386")    ARCH=i386   ;; \
     esac \
-    && TEMP_DIR=$(mktemp -d) 
+    && TEMP_DIR=$(mktemp -d) \
     && cd $TEMP_DIR \
     && curl -o teleport.tar.gz -fsSL https://get.gravitational.com/teleport-v${TELEPORT_VERSION}-linux-${ARCH}-bin.tar.gz \
     && tar xvf teleport.tar.gz --strip=1 teleport/teleport teleport/tctl teleport/tsh \
